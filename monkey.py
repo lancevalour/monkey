@@ -3,17 +3,11 @@ import os
 from os import path
 import subprocess
 
-# WORK_DIRECTORY = 'C:\\Users\\ZhangY\\Desktop\\demo\\demo.py'
-# PACKAGE = 'com.faro.android.boilerplate'
-# STARTING_ACTIVITY = PACKAGE + '.activity.SplashActivity'
-
-
 def cli():
     cur_dir = os.getcwd()
 
-    # print(cur_dir)
     files = [f for f in os.listdir(cur_dir) if path.isfile(f)]
-    # print(files)
+
     apk_files = []
     py_files = []
 
@@ -56,9 +50,3 @@ def check_py_file(py_files):
 
     }[len(py_files)]]
 
-# subprocess.call("monkeyrunner " + WORK_DIRECTORY, shell=True)
-
-
-# demo = Demo(WORK_DIRECTORY, PACKAGE, STARTING_ACTIVITY)
-# demo.run()
-#
