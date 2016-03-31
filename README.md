@@ -37,4 +37,4 @@ swipe 100,100 50,100
 ```  
 
 ## Todo
-Create monkeyrunner script on the fly based on user options. 
+Finish monkey command basic functionality.
