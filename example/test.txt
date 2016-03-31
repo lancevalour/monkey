@@ -1,0 +1,19 @@
+com.faro.android.tracker
+com.faro.android.tracker.activity.SplashActivity
+
+swipe left 3
+touch bottom right 
+touch middle lower
+
+swipe up
+swipe down
+touch top left
+
+touch middle upper
+swipe left 
+
+touch bottom right
+touch top left
+
+swipe left
+

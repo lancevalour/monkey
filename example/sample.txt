@@ -1,0 +1,24 @@
+com.domain.app
+com.domain.app.activity.SplashActivity
+
+# Action 1
+swipe left 3
+touch bottom-right 
+
+# Action 2 
+touch middle-lower
+swipe up
+swipe down
+touch top left
+
+# Action 3 
+touch middle upper
+swipe left 
+
+# Action 4
+touch bottom right
+touch top left
+
+# Action 5 
+swipe left
+
