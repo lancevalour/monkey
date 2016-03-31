@@ -1,3 +1,5 @@
+# import monkeyrunner only when using cli, for testing MonkeyParser class,
+# remove the import.
 from com.android.monkeyrunner import MonkeyRunner, MonkeyDevice
 import os
 import random
@@ -79,7 +81,21 @@ class MonkeyParser:
         else:
             print("Command " + action + " not available")
 
-    # touch
+    # sleep
+    # sleep 3
+    def parse_sleep(self, commands):
+        if len(commands) == 0:
+            print("Sleep 1 sec")
+        elif len(commands) == 1:
+            if not str(commands[0]).isdigit():
+                return "Invalid sleep time"
+            else:
+                print("sleep " + str(commands[0]) + " secs")
+        else:
+            return "Invalid sleep option"
+
+        return "Sleep command good"
+
     # touch 3
     # touch 100,100
     # touch 100,100 200,200 300,300
@@ -90,7 +106,8 @@ class MonkeyParser:
         # print(commands)
 
         if len(commands) == 0:
-            position_list.append([str(random.randint(1, self.device_width)), str(random.randint(1, self.device_height))])
+            position_list.append([str(random.randint(1, self.device_width)),
+                                  str(random.randint(1, self.device_height))])
             return position_list
 
         last_command = commands[len(commands) - 1]
@@ -101,7 +118,8 @@ class MonkeyParser:
 
             if len(mid_commands) == 0:
                 for i in range(0, int(last_command)):
-                    position_list.append([str(random.randint(1, self.device_width)), str(random.randint(1, self.device_height))])
+                    position_list.append([str(random.randint(1, self.device_width)),
+                                          str(random.randint(1, self.device_height))])
             else:
                 for i in range(0, int(last_command)):
                     for j in range(0, len(mid_commands)):
@@ -122,50 +140,6 @@ class MonkeyParser:
 
         return position_list
 
-
-    # positions = []
-    #
-    # if len(commands) < 2:
-    #     positions[0] = [random.randint(1, self.device_width), random.randint(1, self.device_height)]
-    #
-    # if len(commands) == 2:
-    #     if str(commands[1]).isdigit():
-    #         for i in range(0, commands[1]):
-    #             positions[i] = [random.randint(1, self.device_width), random.randint(1, self.device_height)]
-    #     else:
-    #         coordinates = str(commands[1]).split(";")
-    #         for i in range(0, len(coordinates)):
-    #             positions[i] = str(coordinates[i]).split(",")
-    # else:
-    #     last_command = commands[len(commands) - 1]
-    #     mid_commands = commands[1:len(commands) - 1]
-    #
-    #     if str(last_command).isdigit():
-    #         for i in range(0, last_command):
-    #             if str(mid_commands[0]).find(self.COMMA) != -1:
-    #
-    #             for j in range(1, len(mid_commands)):
-    #                 if ',' in mid_commands[j]:
-    #
-    #             positions[i] = [random.randint(1, self.device_width), random.randint(1, self.device_height)]
-    #
-    #
-
-    # sleep
-    # sleep 3
-    def parse_sleep(self, commands):
-        if len(commands) == 0:
-            print("Sleep 1 sec")
-        elif len(commands) == 1:
-            if not str(commands[0]).isdigit():
-                return "Invalid sleep time"
-            else:
-                print("sleep " + str(commands[0]) + " secs")
-        else:
-            return "Invalid sleep option"
-
-        return "Sleep command good"
-
     # swipe
     # swipe 3
     # swipe 100,100 200,200
@@ -173,8 +147,52 @@ class MonkeyParser:
     # swipe 100,100 200,200 200,200 300,300
     # swipe 100,100 200,200 200,200 300,300 6
     def parse_swipe(self, commands):
-        print("Action = " + "swipe")
+        position_list = []
 
+        if len(commands) == 0:
+            position_list.append(
+                [[str(random.randint(1, self.device_width)), str(random.randint(1, self.device_height))],
+                 [str(random.randint(1, self.device_width)), str(random.randint(1, self.device_height))]])
+            return position_list
+
+        last_command = commands[len(commands) - 1]
+
+        if str(last_command).isdigit():
+            mid_commands = commands[0: len(commands) - 1]
+
+            if len(mid_commands) == 0:
+                for i in range(0, int(last_command)):
+                    position_list.append(
+                        [[str(random.randint(1, self.device_width)), str(random.randint(1, self.device_height))],
+                         [str(random.randint(1, self.device_width)), str(random.randint(1, self.device_height))]])
+            elif len(mid_commands) % 2 == 0:
+                for i in range(0, int(last_command)):
+                    for j in range(0, len(mid_commands), 2):
+                        start = str(mid_commands[j]).split(",")
+                        stop = str(mid_commands[j + 1]).split(",")
+                        if len(start) == 2 and str(start[0]).isdigit() and str(start[1]).isdigit()\
+                                and len(stop) == 2 and str(stop[0]).isdigit() and str(stop[1]).isdigit():
+                            position_list.append([start, stop])
+                        else:
+                            return "Invalid swipe position"
+            else:
+                return "Invalid swipe position pair"
+        else:
+            mid_commands = commands[0: len(commands)]
+            if len(mid_commands) % 2 == 0:
+                for i in range(0, len(mid_commands), 2):
+                    start = str(mid_commands[i]).split(",")
+                    stop = str(mid_commands[i + 1]).split(",")
+                    if len(start) == 2 and str(start[0]).isdigit() and str(start[1]).isdigit() \
+                            and len(stop) == 2 and str(stop[0]).isdigit() and str(stop[1]).isdigit():
+                        position_list.append([start, stop])
+                    else:
+                        return "Invalid swipe position"
+
+            else:
+                return "Invalid swipe position pair"
+
+        return position_list
 
     # press
     # press 3
@@ -187,23 +205,39 @@ class MonkeyParser:
 
 cur_dir = os.getcwd()
 parser = MonkeyParser("C:/Users/ZhangY/Desktop/demo/sample.txt")
-print("### parse_sleep test ###")
-print(parser.parse_sleep([]))
-print(parser.parse_sleep(["1"]))
-print(parser.parse_sleep(["3", "3"]))
-print(parser.parse_sleep(["d"]))
-print("### parse_sleep test ###\n")
+# print("### parse_sleep test ###")
+# print(parser.parse_sleep([]))
+# print(parser.parse_sleep(["1"]))
+# print(parser.parse_sleep(["3", "3"]))
+# print(parser.parse_sleep(["d"]))
+# print("### parse_sleep test ###\n")
+#
+# print("### parse_touch test ###")
+# print(parser.parse_touch([]))
+# print(parser.parse_touch(["3"]))
+# print(parser.parse_touch(["100,100"]))
+# print(parser.parse_touch(["100,100", "200,200"]))
+# print(parser.parse_touch(["100,100", "200,200", "300,300"]))
+# print(parser.parse_touch(["100,100", "3"]))
+# print(parser.parse_touch(["100,100", "3", "3"]))
+# print(parser.parse_touch(["100,100", "3", "100,100", "3"]))
+# print(parser.parse_touch(["100,100", "200,200", "300,300", "3"]))
+# print("### parse_touch test ###\n")
 
-print("### parse_touch test ###")
-print(parser.parse_touch([]))
-print(parser.parse_touch(["3"]))
-print(parser.parse_touch(["100,100"]))
-print(parser.parse_touch(["100,100", "200,200"]))
-print(parser.parse_touch(["100,100", "200,200", "300,300"]))
-print(parser.parse_touch(["100,100", "3"]))
-print(parser.parse_touch(["100,100", "3", "3"]))
-print(parser.parse_touch(["100,100", "3", "100,100", "3"]))
-print(parser.parse_touch(["100,100", "200,200", "300,300", "3"]))
-print("### parse_touch test ###")
+#
+# print("### parse_swipe test ###")
+# print(parser.parse_swipe([]))
+# print(parser.parse_swipe(["3"]))
+# print(parser.parse_swipe(["100,100"]))
+# print(parser.parse_swipe(["100,100", "200,200"]))
+# print(parser.parse_swipe(["100,100", "200,200", "3"]))
+# print(parser.parse_swipe(["100,100", "200,200", "300,300"]))
+# print(parser.parse_swipe(["100,100", "200,200", "300,300", "400,400"]))
+# print(parser.parse_swipe(["100,100", "200,200", "300,300", "400,400", "3"]))
+# print(parser.parse_swipe(["100,100", "3"]))
+# print(parser.parse_swipe(["100,100", "3", "3"]))
+# print(parser.parse_swipe(["100,100", "3", "100,100", "3", "3"]))
+# print(parser.parse_swipe(["100,100", "200,200", "3", "3"]))
+# print("### parse_swipe test ###\n")
 
 

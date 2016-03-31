@@ -23,14 +23,14 @@ def cli():
         elif ext == '.txt':
             txt_files.append(f)
 
-    print(check_apk_file(apk_files)[1])
-    print(check_py_file(py_files)[1])
-    print(check_txt_file(txt_files)[1])
-    print(os.path.abspath(os.path.dirname(__file__)))
-    if check_apk_file(apk_files)[0] == 1 and check_py_file(py_files)[0] == 1:
+    # print(check_apk_file(apk_files)[0])
+    # print(check_py_file(py_files)[1])
+    # print(check_txt_file(txt_files)[0])
+    # print(os.path.abspath(os.path.dirname(__file__)))
+    if check_apk_file(apk_files)[0] == 1 and check_txt_file(txt_files)[0] == 1:
         run_monkey_runner(project_dir + "\\monkey_parser.py")
     else:
-        print("Make sure you have one apk and python file.")
+        print("Make sure you have one apk and text file.")
 
 
 def run_monkey_runner(script):
