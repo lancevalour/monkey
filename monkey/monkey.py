@@ -1,18 +1,21 @@
-import click
 import os
 from os import path
 import subprocess
 
+temp_file_dir = "temp\monkey_tmp.txt"
+
 
 def cli():
-    cur_dir = os.getcwd()
-    project_dir = os.path.abspath(os.path.dirname(__file__))
-
-    files = [f for f in os.listdir(cur_dir) if path.isfile(f)]
-
     apk_files = []
     py_files = []
     txt_files = []
+
+    cur_dir = os.getcwd()
+    project_dir = os.path.abspath(os.path.dirname(__file__))
+
+    # print(os.path.abspath(os.sep))
+
+    files = [f for f in os.listdir(cur_dir) if path.isfile(f)]
 
     for f in files:
         ext = os.path.splitext(f)[1]
@@ -23,14 +26,24 @@ def cli():
         elif ext == '.txt':
             txt_files.append(f)
 
-    # print(check_apk_file(apk_files)[0])
-    # print(check_py_file(py_files)[1])
-    # print(check_txt_file(txt_files)[0])
-    # print(os.path.abspath(os.path.dirname(__file__)))
     if check_apk_file(apk_files)[0] == 1 and check_txt_file(txt_files)[0] == 1:
-        run_monkey_runner(project_dir + "\\monkey_parser.py")
+        remove_png()
+        create_temp_path(os.path.abspath(apk_files[0]) + "\n" + os.path.abspath((txt_files[0])))
+        run_monkey_runner(project_dir + "\\monkey_run.py")
     else:
         print("Make sure you have one apk and text file.")
+
+
+def remove_png():
+    for _file in os.listdir(os.getcwd()):
+        if _file.endswith('.png'):
+            os.remove(os.path.join(os.getcwd(), _file))
+
+
+def create_temp_path(temp_path):
+    temp = open(os.path.join(os.path.abspath(os.sep), temp_file_dir), "w")
+    temp.write(temp_path)
+    temp.close()
 
 
 def run_monkey_runner(script):
@@ -66,4 +79,7 @@ def check_txt_file(txt_files):
         2: "Only one script file is allowed."
 
     }[len(txt_files)]]
+
+
+
 

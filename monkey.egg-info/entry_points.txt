@@ -1,4 +1,4 @@
 
         [console_scripts]
-        monkey=monkey:cli
+        monkey=monkey.monkey:cli
     

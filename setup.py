@@ -11,6 +11,9 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        monkey=monkey:cli
+        monkey=monkey.monkey:cli
     ''',
+    license='MIT',
+    author='Yicheng Zhang',
+    url='https://github.com/lancevalour/monkey'
 )

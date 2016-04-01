@@ -3,9 +3,10 @@ A python cli wrapper for Monkeyrunner.
 
 ## Usage
 ```
-$ pip install --editable .
+$ pip install monkey
 $ cd YOUR_DIRECTORY
-$ monkey script.txt
+$ monkey
+$ monkey app.apk script.txt
 ```
 
 ## Sample Script

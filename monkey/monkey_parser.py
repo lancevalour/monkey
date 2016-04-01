@@ -1,8 +1,12 @@
 # import monkeyrunner only when using cli, for testing MonkeyParser class,
 # remove the import.
 from com.android.monkeyrunner import MonkeyRunner, MonkeyDevice
-import os
 import random
+import os
+import sys
+from os.path import dirname
+sys.path.append(dirname(__file__))
+import monkey
 
 
 class MonkeyParser:
@@ -12,22 +16,46 @@ class MonkeyParser:
         'press': 'press',
         'sleep': 'sleep'}
 
-    def __init__(self, file_name):
-        self.file_name = file_name
-        self.file = None
-        self.lines = None
-        self.package = None
-        self.start_activity = None
-        self.device = None
-        self.device_width = 800
-        self.device_height = 1000
+    def __init__(self, apk_file, script_file):
+        self.__script_file = script_file
+        self.__apk_file = apk_file
+        self.__device = None
+        self.__device_width = 600
+        self.__device_height = 800
 
-    def set_file(self, file_name):
-        self.file_name = file_name
+    def run(self):
+        lines = self.get_lines()
+
+        if len(lines) < 2:
+            return "Invalid script file."
+
+        self.__device = MonkeyRunner.waitForConnection()
+
+        package_name = lines[0]
+        apk_path = self.__device.shell('pm path ' + package_name)
+        if apk_path.startswith('package:'):
+            self.device.removePackage(package_name)
+
+
+        self.__device.installPackage(os.getcwd() + 'app-debug.apk')
+
+        self.__device_width = int(self.__device.getProperty('display.width'))
+        self.__device_height = int(self.__device.getProperty('display.height'))
+
+        print(str(self.device_width) + "   " + str(self.device_height))
+
+        for i in range(2, len(self.lines)):
+            print(self.parse_line(self.lines[i]))
+
+
+
+
+    def set_script(self, script_file):
+        self.__script_file = script_file
 
     def get_lines(self):
         lines = []
-        f = open(self.file_name)
+        f = open(self.__script_file)
         for line in iter(f):
             line = line.strip().rstrip()
             if line and (line[0] != "#"):
@@ -37,47 +65,25 @@ class MonkeyParser:
 
         return lines
 
-    def run(self):
-        self.lines = self.get_lines()
-
-        if len(self.lines) < 2:
-            return "Invalid script file."
-
-        self.device = MonkeyRunner.waitForConnection()
-
-        package_name = self.lines[0]
-        apk_path = self.device.shell('pm path ' + package_name)
-        if apk_path.startswith('package:'):
-            self.device.removePackage(package_name)
-
-        self.device.installPackage(package_name)
-
-        self.device_width = int(self.device.getProperty('display.width'))
-        self.device_height = int(self.device.getProperty('display.height'))
-
-        print(self.device_width + "   " + self.device_height)
-
-        for i in range(2, len(self.lines)):
-            print("haha")
-            # parse_line(self.lines[i])
-
     def parse_line(self, line):
         commands = str(line).split(" ")
-        print(commands)
 
         action = str(commands[0])
-        print(action)
 
         commands = commands[1:len(commands)]
 
         if action == self.ACTION_DICT['touch']:
-            self.parse_touch(commands)
+            print("action: " + action)
+            return self.parse_touch(commands)
         elif action == self.ACTION_DICT['swipe']:
-            self.parse_swipe(commands)
+            print("action: " + action)
+            return self.parse_swipe(commands)
         elif action == self.ACTION_DICT['sleep']:
-            self.parse_sleep(commands)
+            print("action: " + action)
+            return self.parse_sleep(commands)
         elif action == self.ACTION_DICT['press']:
-            self.parse_press(commands)
+            print("action: " + action)
+            return self.parse_press(commands)
         else:
             print("Command " + action + " not available")
 
@@ -106,8 +112,8 @@ class MonkeyParser:
         # print(commands)
 
         if len(commands) == 0:
-            position_list.append([str(random.randint(1, self.device_width)),
-                                  str(random.randint(1, self.device_height))])
+            position_list.append([str(random.randint(1, self.__device_width)),
+                                  str(random.randint(1, self.__device_height))])
             return position_list
 
         last_command = commands[len(commands) - 1]
@@ -118,8 +124,8 @@ class MonkeyParser:
 
             if len(mid_commands) == 0:
                 for i in range(0, int(last_command)):
-                    position_list.append([str(random.randint(1, self.device_width)),
-                                          str(random.randint(1, self.device_height))])
+                    position_list.append([str(random.randint(1, self.__device_width)),
+                                          str(random.randint(1, self.__device_height))])
             else:
                 for i in range(0, int(last_command)):
                     for j in range(0, len(mid_commands)):
@@ -151,8 +157,8 @@ class MonkeyParser:
 
         if len(commands) == 0:
             position_list.append(
-                [[str(random.randint(1, self.device_width)), str(random.randint(1, self.device_height))],
-                 [str(random.randint(1, self.device_width)), str(random.randint(1, self.device_height))]])
+                [[str(random.randint(1, self.__device_width)), str(random.randint(1, self.__device_height))],
+                 [str(random.randint(1, self.__device_width)), str(random.randint(1, self.__device_height))]])
             return position_list
 
         last_command = commands[len(commands) - 1]
@@ -163,8 +169,8 @@ class MonkeyParser:
             if len(mid_commands) == 0:
                 for i in range(0, int(last_command)):
                     position_list.append(
-                        [[str(random.randint(1, self.device_width)), str(random.randint(1, self.device_height))],
-                         [str(random.randint(1, self.device_width)), str(random.randint(1, self.device_height))]])
+                        [[str(random.randint(1, self.__device_width)), str(random.randint(1, self.__device_height))],
+                         [str(random.randint(1, self.__device_width)), str(random.randint(1, self.__device_height))]])
             elif len(mid_commands) % 2 == 0:
                 for i in range(0, int(last_command)):
                     for j in range(0, len(mid_commands), 2):
@@ -203,8 +209,7 @@ class MonkeyParser:
         print("Action = " + "press")
 
 
-cur_dir = os.getcwd()
-parser = MonkeyParser("C:/Users/ZhangY/Desktop/demo/sample.txt")
+
 # print("### parse_sleep test ###")
 # print(parser.parse_sleep([]))
 # print(parser.parse_sleep(["1"]))
@@ -240,4 +245,16 @@ parser = MonkeyParser("C:/Users/ZhangY/Desktop/demo/sample.txt")
 # print(parser.parse_swipe(["100,100", "200,200", "3", "3"]))
 # print("### parse_swipe test ###\n")
 
-
+# f = open(os.path.join(os.path.abspath(os.sep), monkey.temp_file_dir))
+# paths = []
+# for _line in iter(f):
+#     _line = _line.strip().rstrip()
+#     paths.append(_line)
+# f.close()
+#
+# os.remove(os.path.join(os.path.abspath(os.sep), monkey.temp_file_dir))
+#
+# parser = MonkeyParser(paths[0], paths[1])
+# parser.parse_line(parser.get_lines()[3])
+#
+#
