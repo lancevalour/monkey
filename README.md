@@ -13,28 +13,22 @@ $ monkey app.apk script.txt
 ```   
 com.domain.app
 com.domain.app.activity.SplashActivity
-    
+
 # Action 1
-swipe 100,100 50,100 3
-touch 800,1000
+swipe 1100,900 500,900 2
+touch 1100,1724
 sleep 3
 
 # Action 2 
-touch 500,600
-swipe 100,200 50,200
-swipe 50,200 100,200
+touch 600,1300
+sleep 3
 touch 100,100
 
-# Action 3 
-touch 500,500
-swipe 100,100 50,100
-
-# Action 4
-touch 800,1000
+# Action 3
+touch 600,1200
+sleep 8
 touch 100,100
 
-# Action 5 
-swipe 100,100 50,100
 ```  
 
 ## Todo
