@@ -28,8 +28,8 @@ def cli():
 
     if check_apk_file(apk_files)[0] == 1 and check_txt_file(txt_files)[0] == 1:
         remove_png()
-        create_temp_path(os.path.abspath(apk_files[0]) + "\n" + os.path.abspath((txt_files[0])))
-        run_monkey_runner(project_dir + "\\monkey_run.py")
+        create_temp_file(os.getcwd() + "/" + "\n" + os.path.abspath(apk_files[0]) + "\n" + os.path.abspath((txt_files[0])))
+        run_monkey_runner(project_dir + "/monkey_run.py")
     else:
         print("Make sure you have one apk and text file.")
 
@@ -40,9 +40,9 @@ def remove_png():
             os.remove(os.path.join(os.getcwd(), _file))
 
 
-def create_temp_path(temp_path):
+def create_temp_file(temp_file):
     temp = open(os.path.join(os.path.abspath(os.sep), temp_file_dir), "w")
-    temp.write(temp_path)
+    temp.write(temp_file)
     temp.close()
 
 

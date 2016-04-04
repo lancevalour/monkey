@@ -1,12 +1,9 @@
 # import monkeyrunner only when using cli, for testing MonkeyParser class,
 # remove the import.
-from com.android.monkeyrunner import MonkeyRunner, MonkeyDevice
 import random
-import os
 import sys
 from os.path import dirname
 sys.path.append(dirname(__file__))
-import monkey
 
 
 class MonkeyParser:
@@ -16,53 +13,31 @@ class MonkeyParser:
         'press': 'press',
         'sleep': 'sleep'}
 
-    def __init__(self, apk_file, script_file):
-        self.__script_file = script_file
-        self.__apk_file = apk_file
-        self.__device = None
+    def __init__(self):
         self.__device_width = 600
         self.__device_height = 800
 
-    def run(self):
-        lines = self.get_lines()
+    def set_device_width(self, device_width):
+        self.__device_width = device_width
 
-        if len(lines) < 2:
-            return "Invalid script file."
+    def set_device_height(self, device_height):
+        self.__device_height = device_height
 
-        self.__device = MonkeyRunner.waitForConnection()
+    def get_device_width(self):
+        return self.__device_width
 
-        package_name = lines[0]
-        apk_path = self.__device.shell('pm path ' + package_name)
-        if apk_path.startswith('package:'):
-            self.device.removePackage(package_name)
+    def get_device_height(self):
+        return self.__device_height
 
-
-        self.__device.installPackage(os.getcwd() + 'app-debug.apk')
-
-        self.__device_width = int(self.__device.getProperty('display.width'))
-        self.__device_height = int(self.__device.getProperty('display.height'))
-
-        print(str(self.device_width) + "   " + str(self.device_height))
-
-        for i in range(2, len(self.lines)):
-            print(self.parse_line(self.lines[i]))
-
-
-
-
-    def set_script(self, script_file):
-        self.__script_file = script_file
-
-    def get_lines(self):
+    def get_lines(self, script_file):
         lines = []
-        f = open(self.__script_file)
+        f = open(script_file)
         for line in iter(f):
             line = line.strip().rstrip()
             if line and (line[0] != "#"):
                 lines.append(line)
 
         f.close()
-
         return lines
 
     def parse_line(self, line):
@@ -74,33 +49,35 @@ class MonkeyParser:
 
         if action == self.ACTION_DICT['touch']:
             print("action: " + action)
-            return self.parse_touch(commands)
+            return [action, self.parse_touch(commands)]
         elif action == self.ACTION_DICT['swipe']:
             print("action: " + action)
-            return self.parse_swipe(commands)
+            return [action, self.parse_swipe(commands)]
         elif action == self.ACTION_DICT['sleep']:
             print("action: " + action)
-            return self.parse_sleep(commands)
+            return [action, self.parse_sleep(commands)]
         elif action == self.ACTION_DICT['press']:
             print("action: " + action)
-            return self.parse_press(commands)
+            return [action, self.parse_press(commands)]
         else:
             print("Command " + action + " not available")
+
+        return []
 
     # sleep
     # sleep 3
     def parse_sleep(self, commands):
         if len(commands) == 0:
             print("Sleep 1 sec")
+            return 1
         elif len(commands) == 1:
             if not str(commands[0]).isdigit():
                 return "Invalid sleep time"
             else:
                 print("sleep " + str(commands[0]) + " secs")
-        else:
-            return "Invalid sleep option"
+                return str(commands[0])
 
-        return "Sleep command good"
+        return "Invalid sleep option"
 
     # touch 3
     # touch 100,100
